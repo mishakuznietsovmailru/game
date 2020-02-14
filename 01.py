@@ -30,7 +30,7 @@ class Board:
 
     # загрузка следующего уровня
     def level_load(self, level_number):
-        name = 'level_' + str(level_number) + '.txt'
+        name = 'data/level_' + str(level_number) + '.txt'
         text_level = open(name, 'r')
         q = []
         s = 0
@@ -94,8 +94,8 @@ class Board:
                 self.pole[(mouse_pos[0] - self.left) // self.cell_size][(mouse_pos[1] - self.top) // self.cell_size] = 2
             else:
                 self.pole[(mouse_pos[0] - self.left) // self.cell_size][(mouse_pos[1] - self.top) // self.cell_size] = 0
-            print('(' + str((mouse_pos[0] - self.left) // self.cell_size) + ', ' + str((mouse_pos[1] - self.top)
-                                                                                       // self.cell_size) + ')')
+            #print('(' + str((mouse_pos[0] - self.left) // self.cell_size) + ', ' + str((mouse_pos[1] - self.top)
+            #                                                                          // self.cell_size) + ')')
             return result
         else:
             return None
@@ -176,20 +176,23 @@ class Board:
 
 
 game_name = 'имя игры'
-s_fall = pygame.mixer.Sound('q.wav')
-s_left = pygame.mixer.Sound('w.wav')
-s_collect = pygame.mixer.Sound('e.wav')
+s_fall = pygame.mixer.Sound('data/q.wav')
+s_left = pygame.mixer.Sound('data/w.wav')
+s_collect = pygame.mixer.Sound('data/e.wav')
 
 pygame.display.set_caption(game_name)
 # размеры окна игры
+
 win_weight = 1000
 win_height = 600
+screen_size=(win_weight,win_height)
 # шрифт текста
 font = pygame.font.Font(None, 80)
 font_small = pygame.font.Font(None, 25)
 text_color = (255, 255, 255)
 screen = pygame.display.set_mode((win_weight, win_height))
 intro = True
+intro1 = True
 running = True
 start_screen = True
 key = False
@@ -213,13 +216,14 @@ while intro:
             start_screen = False
 screen.fill((20, 20, 20))
 # загрузка картинок
-back_image = pygame.image.load("background.jpg").convert()
-op_image = pygame.image.load("1.png").convert()
-lest_image = pygame.image.load("2.png").convert()
-geld_image = pygame.image.load("3.png").convert()
-pers_image = pygame.image.load("4.png").convert()
-pers_rewerse_image = pygame.image.load("reverse.png").convert()
-win_image = pygame.image.load("win.png").convert()
+back_image = pygame.image.load("data/background.jpg").convert()
+op_image = pygame.image.load("data/1.png").convert()
+lest_image = pygame.image.load("data/2.png").convert()
+geld_image = pygame.image.load("data/3.png").convert()
+pers_image = pygame.image.load("data/4.png").convert()
+pers_rewerse_image = pygame.image.load("data/reverse.png").convert()
+win_image = pygame.transform.scale(pygame.image.load("data/win.png").convert(),screen_size)
+
 screen.blit(back_image, [0, 0])
 pygame.display.flip()
 # кнопка начать
@@ -263,7 +267,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            intro = False
+            intro1 = False
+            intro=False
         elif event.type == pygame.KEYDOWN:
             key = True
             first_step = True
@@ -283,6 +288,10 @@ while running:
             if g == 0:
                 if board.level == board.kolvo_levels:
                     running = False
+                    intro1=True
+                    print(intro1)
+                    # screen.blit(win_image, (0, 0))
+
                 else:
                     board.person = [0, 0]
                     board.level += 1
@@ -311,21 +320,27 @@ while running:
                 while not board.floor:
                     s_fall.play()
                     board.fall()
-                    pygame.display.flip()
+
+                    pygame.display.update()
         elif event.type == pygame.KEYUP:
             key = False
-    board.render()
-    pygame.display.flip()
 
-while intro:
+    board.render()
+
+
+    pygame.display.update()
+
+while intro1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            intro = False
-    text = font.render("Вы победили!!!", True, text_color)
-    screen.blit(text, [win_weight // 9, win_height // 2])
-    board.render()
-    pygame.display.flip()
-    time.sleep(2)
-    intro = False
+            intro1 = False
+    screen.blit(win_image, (0, 0))
+    # text = font.render("Вы победили!!!", True, text_color)
+    # screen.blit(text, [win_weight // 9, win_height // 2])
+    # board.render()
+    pygame.display.update()
+    # time.sleep(2)
+    # //intro1 = False
 
 pygame.quit()
+quit()
